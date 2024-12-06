@@ -17,6 +17,7 @@ class OdomTFPublisher(Node):
         )
         # Create transform broadcaster
         self.tf_broadcaster = TransformBroadcaster(self)
+        self.get_logger().info("TF publisher started!")
 
     def broadcast_transform(self, msg: Odometry):
         # Create a TransformStamped message
@@ -26,13 +27,16 @@ class OdomTFPublisher(Node):
         transform.child_frame_id = 'base_link'
 
         # Set translation
-        transform.transform.translation = msg.pose.pose.position
+        transform.transform.translation.x = msg.pose.pose.position.x
+        transform.transform.translation.y = msg.pose.pose.position.y
+        transform.transform.translation.z = msg.pose.pose.position.z
 
         # Set rotation
         transform.transform.rotation = msg.pose.pose.orientation
 
         # Broadcast the transform
         self.tf_broadcaster.sendTransform(transform)
+        self.get_logger().debug("Published tf")
 
 def main(args=None):
     rclpy.init(args=args)
