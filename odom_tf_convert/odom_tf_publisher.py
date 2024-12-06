@@ -3,6 +3,8 @@ from rclpy.node import Node
 from nav_msgs.msg import Odometry
 from tf2_ros import TransformBroadcaster
 from geometry_msgs.msg import TransformStamped
+from tf_transformations import euler_from_quaternion
+import math
 
 class OdomTFPublisher(Node):
     def __init__(self):
@@ -36,7 +38,11 @@ class OdomTFPublisher(Node):
 
         # Broadcast the transform
         self.tf_broadcaster.sendTransform(transform)
-        self.get_logger().debug("Published tf")
+        normal = euler_from_quaternion(msg.pose.pose.orientation.x,
+                                       msg.pose.pose.orientation.y,
+                                       msg.pose.pose.orientation.z,
+                                       msg.pose.pose.orientation.w)
+        self.get_logger().info("Published tf with yaw: {}".format(math.degrees(normal[2])))
 
 def main(args=None):
     rclpy.init(args=args)
